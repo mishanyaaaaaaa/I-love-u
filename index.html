@@ -1,557 +1,350 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Особое приглашение для тебя ✨</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        wine: {
-                            900: '#1F0307',
-                            800: '#2B050B',
-                            700: '#4A0E17',
-                            600: '#7A1C28',
-                            500: '#A32838',
-                        },
-                        champagne: {
-                            100: '#FFF9E6',
-                            200: '#F3E5AB',
-                            300: '#E8D5B5',
-                            400: '#D4AF37',
-                        },
-                        darkBg: '#0B0A0E',
-                        darkCard: '#131118',
-                    },
-                    fontFamily: {
-                        serif: ['Cormorant Garamond', 'serif'],
-                        sans: ['Montserrat', 'sans-serif'],
-                        script: ['Great Vibes', 'cursive'],
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Canvas Confetti CDN for celebration -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Особенное Приглашение</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #0A0507;
+      --deep-wine: #4A0E17;
+      --burgundy: #7A1C28;
+      --gold: #D4AF37;
+      --gold-light: #F3E5AB;
+      --cream: #FAF5EF;
+      --glass-bg: rgba(26, 10, 15, 0.65);
+      --glass-border: rgba(212, 175, 55, 0.25);
+    }
 
-    <style>
-        body {
-            background-color: #0B0A0E;
-            color: #E8D5B5;
-            font-family: 'Montserrat', sans-serif;
-            overflow-x: hidden;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0B0A0E;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4A0E17;
-            border-radius: 3px;
-        }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--cream);
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-        /* Gold Gradient Borders & Text */
-        .gold-border {
-            border: 1px solid transparent;
-            border-image: linear-gradient(135deg, #D4AF37 0%, #4A0E17 50%, #F3E5AB 100%) 1;
-        }
-        
-        .gold-border-rounded {
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            box-shadow: 0 0 15px rgba(122, 28, 40, 0.2);
-        }
+    /* Анимированный глубокий фон */
+    .bg-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 30%, #3a0810 0%, #0a0507 80%);
+      z-index: -2;
+    }
 
-        .gold-text {
-            background: linear-gradient(135deg, #FFF9E6 0%, #E8D5B5 50%, #D4AF37 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    /* Частицы фона */
+    canvas#particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
 
-        .gold-glow {
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
-        }
+    /* Главный контейнер */
+    .container {
+      width: 90%;
+      max-width: 520px;
+      margin: 20px auto;
+      perspective: 1000px;
+      position: relative;
+    }
 
-        .wine-glow {
-            box-shadow: 0 0 35px rgba(122, 28, 40, 0.35);
-        }
+    /* Вводная открытка с сургучом */
+    .envelope-card {
+      background: linear-gradient(135deg, rgba(35, 12, 18, 0.95), rgba(15, 5, 8, 0.98));
+      border: 1px solid var(--gold);
+      border-radius: 16px;
+      padding: 50px 20px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 20px rgba(122, 28, 40, 0.3);
+      cursor: pointer;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+      position: relative;
+      overflow: hidden;
+    }
 
-        /* Glassmorphism */
-        .glass-card {
-            background: rgba(19, 17, 24, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(212, 175, 55, 0.18);
-        }
+    .envelope-card::before {
+      content: '';
+      position: absolute;
+      top: 10px; left: 10px; right: 10px; bottom: 10px;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 12px;
+      pointer-events: none;
+    }
 
-        /* Envelope styling */
-        .envelope-wrapper {
-            perspective: 1000px;
-        }
+    .wax-seal {
+      width: 90px;
+      height: 90px;
+      background: radial-gradient(circle at 30% 30%, #9e2a2b, #4a0e17);
+      border-radius: 50%;
+      margin: 0 auto 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6), inset 0 2px 5px rgba(255,255,255,0.3);
+      border: 2px solid #b8323a;
+      transition: transform 0.3s ease;
+    }
 
-        .wax-seal {
-            background: radial-gradient(circle, #8a1f2d 0%, #4A0E17 70%, #2B050B 100%);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.3);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+    .envelope-card:hover .wax-seal {
+      transform: scale(1.08);
+    }
 
-        .wax-seal:hover {
-            transform: scale(1.08);
-            box-shadow: 0 6px 20px rgba(122, 28, 40, 0.6), inset 0 2px 6px rgba(255,255,255,0.4);
-        }
+    .wax-seal span {
+      font-size: 36px;
+      color: var(--gold-light);
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
 
-        /* Floating particles canvas */
-        #bgCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
+    .envelope-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.3rem;
+      color: var(--gold-light);
+      font-weight: 400;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
 
-        /* Smooth fade-in effects */
-        .fade-in {
-            animation: fadeIn 1.2s ease-out forwards;
-        }
+    .envelope-subtitle {
+      font-size: 0.9rem;
+      color: rgba(250, 245, 239, 0.7);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    /* Основное приглашение */
+    .invite-card {
+      display: none;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 40px 28px;
+      text-align: center;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.7), inset 0 0 30px rgba(212, 175, 55, 0.05);
+      animation: fadeIn 1s ease forwards;
+    }
 
-        /* Ambient audio pulse */
-        @keyframes pulseGlow {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 0.8; }
-        }
-        .ambient-light {
-            animation: pulseGlow 6s infinite ease-in-out;
-        }
-    </style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      border-bottom: 1px solid var(--gold);
+      padding-bottom: 4px;
+      margin-bottom: 20px;
+    }
+
+    .main-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem;
+      color: var(--cream);
+      line-height: 1.2;
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+
+    .description {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: rgba(250, 245, 239, 0.85);
+      margin-bottom: 30px;
+      font-weight: 300;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+      margin-bottom: 35px;
+      text-align: left;
+    }
+
+    .detail-item {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 2px solid var(--gold);
+      padding: 12px 16px;
+      border-radius: 0 10px 10px 0;
+    }
+
+    .detail-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .detail-value {
+      font-size: 0.95rem;
+      color: var(--cream);
+    }
+
+    .buttons-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 16px;
+      border-radius: 30px;
+      border: none;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--burgundy), var(--deep-wine));
+      color: var(--cream);
+      border: 1px solid var(--gold);
+      box-shadow: 0 4px 15px rgba(122, 28, 40, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(122, 28, 40, 0.7);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: rgba(250, 245, 239, 0.6);
+      border: 1px solid rgba(250, 245, 239, 0.2);
+    }
+
+    .btn-secondary:hover {
+      color: var(--cream);
+      border-color: rgba(250, 245, 239, 0.4);
+    }
+
+    /* Экран успешного ответа */
+    .success-screen {
+      display: none;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    .success-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.6rem;
+      color: var(--gold-light);
+      margin-bottom: 15px;
+    }
+
+    .timer-title {
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(250, 245, 239, 0.7);
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+
+    .timer {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .timer-block {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      padding: 12px;
+      border-radius: 10px;
+      min-width: 65px;
+    }
+
+    .timer-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      color: var(--gold-light);
+    }
+
+    .timer-label {
+      font-size: 0.65rem;
+      color: rgba(250, 245, 239, 0.6);
+      text-transform: uppercase;
+    }
+  </style>
 </head>
-<body class="min-h-screen relative flex flex-col justify-between items-center selection:bg-wine-600 selection:text-champagne-100">
+<body>
 
-    <!-- Background Canvas for Particles/Petals -->
-    <canvas id="bgCanvas"></canvas>
+  <div class="bg-gradient"></div>
+  <canvas id="particles"></canvas>
 
-    <!-- Ambient Glowing Orbs in background -->
-    <div class="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-wine-700/20 rounded-full filter blur-[120px] pointer-events-none ambient-light"></div>
-    <div class="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-wine-600/15 rounded-full filter blur-[140px] pointer-events-none ambient-light" style="animation-delay: 3s;"></div>
-
-    <!-- Music Toggle Button (Optional Ambient Tone) -->
-    <div class="fixed top-6 right-6 z-50">
-        <button id="musicToggle" class="p-3 rounded-full glass-card hover:border-champagne-400/50 text-champagne-300 transition-all duration-300 flex items-center gap-2 text-xs tracking-widest uppercase">
-            <i data-lucide="music" class="w-4 h-4 text-champagne-400"></i>
-            <span id="musicText" class="hidden sm:inline">Атмосфера</span>
-        </button>
+  <div class="container">
+    <!-- Этап 1: Закрытая открытка -->
+    <div class="envelope-card" id="envelopeCard" onclick="openInvitation()">
+      <div class="wax-seal">
+        <span>♥</span>
+      </div>
+      <div class="envelope-title">Эксклюзивный день</div>
+      <div class="envelope-subtitle">Завтра только ты и я</div>
     </div>
 
-    <!-- MAIN CONTAINER -->
-    <main class="w-full max-w-2xl px-4 py-12 my-auto z-10 flex flex-col items-center">
+    <!-- Этап 2: Текст приглашения -->
+    <div class="invite-card" id="inviteCard">
+      <div class="badge">Приглашение на незабываемый день</div>
+      <h1 class="main-title">Особенный день для нас двоих</h1>
+      
+      <p class="description">
+        Я приготовил для тебя кое-что особенное. Нас ждет день, наполненный эстетикой, скоростью, яркими эмоциями и романтикой: от утренних впечатлений и красивых кадров до уютного ужина у моря и прогулки по ночному городу.
+      </p>
 
-        <!-- STEP 1: ENVELOPE / SEALED COVER -->
-        <section id="stepIntro" class="w-full flex flex-col items-center text-center transition-all duration-700 ease-in-out">
-            
-            <div class="mb-8 space-y-3">
-                <span class="font-script text-3xl sm:text-4xl text-champagne-400 tracking-wider">Для тебя</span>
-                <h1 class="font-serif text-3xl sm:text-5xl font-light tracking-wide gold-text leading-tight">
-                    Эксклюзивный Вечер
-                </h1>
-                <p class="text-xs sm:text-sm text-champagne-300/70 uppercase tracking-[0.3em] font-light">
-                    Личное приглашение
-                </p>
-            </div>
+      <div class="details-grid">
+        <div class="detail-item">
+          <div class="detail-label">Когда</div>
+          <div class="detail-value">Завтра, 25 Октября • с 12:00 и до самой ночи</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Дресс-код</div>
+          <div class="detail-value">Элегантный & Свободный (чтобы чувствовала себя восхитительно)</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Локация</div>
+          <div class="detail-value">Секрет (я заеду за тобой)</div>
+        </div>
+      </div>
 
-            <!-- Envelope Visual -->
-            <div class="envelope-wrapper my-6 relative w-72 sm:w-80 h-96 glass-card rounded-2xl flex flex-col items-center justify-between p-8 border border-champagne-400/30 wine-glow">
-                
-                <!-- Inner Decorative Frame -->
-                <div class="absolute inset-3 border border-champagne-400/20 rounded-xl pointer-events-none"></div>
-                <div class="absolute inset-4 border border-champagne-400/10 rounded-lg pointer-events-none"></div>
+      <div class="buttons-group">
+        <button class="btn btn-primary" onclick="acceptInvitation()">Я с радостью принимаю ❤️</button>
+        <button class="btn btn-secondary" id="noBtn" onmouseover="moveButton()" onclick="acceptInvitation()">Задумалась... (но ответ «Да»)</button>
+      </div>
+    </div>
 
-                <div class="pt-6">
-                    <i data-lucide="sparkles" class="w-8 h-8 text-champagne-400/60 mx-auto mb-2 stroke-[1.5]"></i>
-                    <p class="font-serif italic text-lg text-champagne-200/90">Таинственный вечер</p>
-                </div>
-
-                <!-- Wax Seal Button -->
-                <div class="relative flex flex-col items-center my-auto cursor-pointer" id="openBtn">
-                    <div class="wax-seal w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center border-2 border-champagne-300/40 cursor-pointer">
-                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-champagne-400/30 flex items-center justify-center">
-                            <i data-lucide="heart" class="w-8 h-8 sm:w-9 sm:h-9 text-champagne-200 fill-champagne-200/20"></i>
-                        </div>
-                    </div>
-                    <span class="mt-4 text-xs tracking-widest text-champagne-300 uppercase font-medium animate-pulse">
-                        Нажми, чтобы открыть
-                    </span>
-                </div>
-
-                <div class="pb-4 text-xs text-champagne-400/50 font-serif italic">
-                    Завтра • Только мы два
-                </div>
-            </div>
-
-        </section>
-
-        <!-- STEP 2: MAIN INVITATION CONTENT (Hidden Initially) -->
-        <section id="stepContent" class="hidden w-full flex-col items-center text-center opacity-0 transition-all duration-1000 ease-out">
-            
-            <!-- Header Tag -->
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-wine-800/50 border border-champagne-400/30 text-champagne-300 text-xs tracking-widest uppercase mb-6">
-                <i data-lucide="wine" class="w-3.5 h-3.5 text-champagne-400"></i>
-                <span>Особый повод</span>
-            </div>
-
-            <h2 class="font-serif text-3xl sm:text-5xl font-normal gold-text mb-4 leading-tight">
-                Незабываемый Вечер
-            </h2>
-
-            <!-- Message Card -->
-            <div class="w-full glass-card rounded-2xl p-6 sm:p-8 mb-8 text-left space-y-4 gold-border-rounded relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-wine-600/10 rounded-full blur-2xl pointer-events-none"></div>
-                
-                <p class="font-serif text-lg sm:text-xl text-champagne-100/90 leading-relaxed italic">
-                    "Завтрашний вечер обещает быть особенным. Я хочу пригласить тебя в атмосферу уюта, изысканных вкусов и неспешных разговоров."
-                </p>
-                <p class="text-sm text-champagne-300/80 leading-relaxed font-light">
-                    Забудь про повседневную суету. Нас ждет винный вечер, приглушенный свет, отличная музыка и прикосновение волшебства. Я подготовил кое-что красивое только для нас.
-                </p>
-            </div>
-
-            <!-- Event Details Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mb-8">
-                
-                <!-- Detail 1 -->
-                <div class="glass-card p-5 rounded-xl flex flex-col items-center justify-center border border-champagne-400/20 hover:border-champagne-400/40 transition-all duration-300">
-                    <div class="p-2.5 rounded-full bg-wine-800/60 mb-3 border border-champagne-400/30">
-                        <i data-lucide="calendar" class="w-5 h-5 text-champagne-400"></i>
-                    </div>
-                    <span class="text-xs text-champagne-400 uppercase tracking-widest mb-1">Когда</span>
-                    <span class="font-serif text-base text-champagne-100 font-semibold">Завтра вечером</span>
-                    <span class="text-[11px] text-champagne-300/60 mt-0.5">Время уточнится ✨</span>
-                </div>
-
-                <!-- Detail 2 -->
-                <div class="glass-card p-5 rounded-xl flex flex-col items-center justify-center border border-champagne-400/20 hover:border-champagne-400/40 transition-all duration-300">
-                    <div class="p-2.5 rounded-full bg-wine-800/60 mb-3 border border-champagne-400/30">
-                        <i data-lucide="sparkles" class="w-5 h-5 text-champagne-400"></i>
-                    </div>
-                    <span class="text-xs text-champagne-400 uppercase tracking-widest mb-1">Дресс-код</span>
-                    <span class="font-serif text-base text-champagne-100 font-semibold">Вечерний элегантный</span>
-                    <span class="text-[11px] text-champagne-300/60 mt-0.5">Твоя любимая помада</span>
-                </div>
-
-                <!-- Detail 3 -->
-                <div class="glass-card p-5 rounded-xl flex flex-col items-center justify-center border border-champagne-400/20 hover:border-champagne-400/40 transition-all duration-300">
-                    <div class="p-2.5 rounded-full bg-wine-800/60 mb-3 border border-champagne-400/30">
-                        <i data-lucide="map-pin" class="w-5 h-5 text-champagne-400"></i>
-                    </div>
-                    <span class="text-xs text-champagne-400 uppercase tracking-widest mb-1">Локация</span>
-                    <span class="font-serif text-base text-champagne-100 font-semibold">Я заеду за тобой</span>
-                    <span class="text-[11px] text-champagne-300/60 mt-0.5">Секретное место</span>
-                </div>
-
-            </div>
-
-            <!-- Question & Decision Buttons -->
-            <div class="w-full glass-card p-6 sm:p-8 rounded-2xl border border-wine-600/40 wine-glow">
-                <h3 class="font-serif text-2xl sm:text-3xl text-champagne-100 mb-2">
-                    Ты пойдёшь со мной?
-                </h3>
-                <p class="text-xs text-champagne-300/70 mb-6">Жду твоего ответа с замиранием сердца...</p>
-
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    
-                    <!-- Yes Option 1 -->
-                    <button id="btnYes1" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-wine-700 via-wine-600 to-wine-700 text-champagne-100 font-medium hover:brightness-125 transition-all duration-300 shadow-lg shadow-wine-900/50 border border-champagne-400/30 flex items-center justify-center gap-2 group">
-                        <span>Да, с удовольствием!</span>
-                        <i data-lucide="sparkles" class="w-4 h-4 text-champagne-300 group-hover:rotate-12 transition-transform"></i>
-                    </button>
-
-                    <!-- Yes Option 2 (Shy/Playful) -->
-                    <button id="btnYes2" class="w-full sm:w-auto px-8 py-3.5 rounded-xl glass-card text-champagne-200 font-medium hover:bg-wine-800/40 border border-champagne-400/30 transition-all duration-300 flex items-center justify-center gap-2 group">
-                        <span>Конечно, да! ❤️</span>
-                    </button>
-
-                </div>
-            </div>
-
-        </section>
-
-        <!-- STEP 3: CONFIRMATION MODAL / SCREEN (Hidden) -->
-        <section id="stepConfirmation" class="hidden w-full flex-col items-center text-center opacity-0 transition-all duration-1000 ease-out">
-            <div class="glass-card rounded-3xl p-8 sm:p-12 border border-champagne-400/40 wine-glow relative overflow-hidden max-w-lg w-full">
-                
-                <div class="w-20 h-20 rounded-full bg-wine-800/80 border border-champagne-400/50 flex items-center justify-center mx-auto mb-6 shadow-xl">
-                    <i data-lucide="heart-handshake" class="w-10 h-10 text-champagne-300"></i>
-                </div>
-
-                <span class="font-script text-4xl text-champagne-400 block mb-2">Прекрасно!</span>
-                <h2 class="font-serif text-3xl sm:text-4xl gold-text mb-4">
-                    Это будет волшебный вечер
-                </h2>
-
-                <p class="text-sm text-champagne-200/80 leading-relaxed mb-6 font-light">
-                    Я уже жду нашей встречи с нетерпением. Завтра я загляну за тобой в назначенное время. Готовься отдыхать и улыбаться! 🍷✨
-                </p>
-
-                <!-- Countdown Box -->
-                <div class="bg-wine-900/60 rounded-xl p-4 border border-champagne-400/20 mb-6">
-                    <span class="text-xs uppercase tracking-widest text-champagne-400 block mb-2">До нашего свидания осталось:</span>
-                    <div id="countdown" class="font-serif text-2xl sm:text-3xl text-champagne-100 font-semibold tracking-wider">
-                        --ч --м --с
-                    </div>
-                </div>
-
-                <div class="pt-2 border-t border-champagne-400/10 text-xs text-champagne-400/60 font-serif italic">
-                    "Самые красивые моменты рождаются неожиданно..."
-                </div>
-
-            </div>
-        </section>
-
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="w-full text-center py-6 text-xs text-champagne-400/40 z-10 font-light tracking-widest">
-        С любовью &bull; Только для тебя
-    </footer>
-
-    <!-- AUDIO SYNTH (Web Audio API - Elegant Ambient Tone on Interaction) -->
-    <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
-
-        // Canvas Floating Particles Background
-        const canvas = document.getElementById('bgCanvas');
-        const ctx = canvas.getContext('2d');
-
-        let particles = [];
-        const particleCount = 45;
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class Particle {
-            constructor() {
-                this.reset();
-            }
-
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height + canvas.height;
-                this.size = Math.random() * 2.5 + 0.8;
-                this.speedY = Math.random() * 0.6 + 0.2;
-                this.speedX = (Math.random() - 0.5) * 0.4;
-                this.opacity = Math.random() * 0.6 + 0.2;
-                // Color palette mix: Gold champagne & Crimson red
-                const isGold = Math.random() > 0.4;
-                this.color = isGold 
-                    ? `rgba(212, 175, 55, ${this.opacity})` 
-                    : `rgba(163, 40, 56, ${this.opacity})`;
-            }
-
-            update() {
-                this.y -= this.speedY;
-                this.x += this.speedX;
-
-                if (this.y < -10) {
-                    this.reset();
-                    this.y = canvas.height + 10;
-                }
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = this.color;
-                ctx.fill();
-            }
-        }
-
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new Particle());
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
-
-        // Web Audio API Soft Sound Synthesizer
-        let audioCtx = null;
-        let isAudioPlaying = false;
-
-        function playAmbientSound() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            // Create gentle warm pad synth note
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(220, audioCtx.currentTime); // A3 note
-            
-            // Soft envelope
-            gain.gain.setValueAtTime(0, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 1.5);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 5);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            osc.start();
-            osc.stop(audioCtx.currentTime + 5);
-        }
-
-        document.getElementById('musicToggle').addEventListener('click', () => {
-            playAmbientSound();
-            const text = document.getElementById('musicText');
-            text.innerText = "Звучит ✨";
-            setTimeout(() => { text.innerText = "Атмосфера"; }, 3000);
-        });
-
-        // STEP TRANSITIONS & INTERACTION
-        const openBtn = document.getElementById('openBtn');
-        const stepIntro = document.getElementById('stepIntro');
-        const stepContent = document.getElementById('stepContent');
-        const stepConfirmation = document.getElementById('stepConfirmation');
-
-        openBtn.addEventListener('click', () => {
-            playAmbientSound();
-
-            // Fade out intro
-            stepIntro.style.opacity = '0';
-            stepIntro.style.transform = 'translateY(-20px)';
-
-            setTimeout(() => {
-                stepIntro.classList.add('hidden');
-                stepContent.classList.remove('hidden');
-                
-                // Trigger reflow & fade in content
-                setTimeout(() => {
-                    stepContent.style.opacity = '1';
-                    stepContent.classList.add('fade-in');
-                }, 50);
-            }, 600);
-        });
-
-        // Celebration Confetti Trigger Function
-        function triggerCelebration() {
-            playAmbientSound();
-
-            // Custom Confetti colors matching the theme
-            const colors = ['#D4AF37', '#F3E5AB', '#7A1C28', '#A32838', '#ffffff'];
-
-            confetti({
-                particleCount: 80,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: colors,
-                scalar: 1.2
-            });
-
-            setTimeout(() => {
-                confetti({
-                    particleCount: 50,
-                    angle: 60,
-                    spread: 55,
-                    origin: { x: 0 },
-                    colors: colors
-                });
-                confetti({
-                    particleCount: 50,
-                    angle: 120,
-                    spread: 55,
-                    origin: { x: 1 },
-                    colors: colors
-                });
-            }, 300);
-
-            // Switch to confirmation screen
-            stepContent.style.opacity = '0';
-            stepContent.style.transform = 'translateY(-20px)';
-
-            setTimeout(() => {
-                stepContent.classList.add('hidden');
-                stepConfirmation.classList.remove('hidden');
-
-                setTimeout(() => {
-                    stepConfirmation.style.opacity = '1';
-                    stepConfirmation.classList.add('fade-in');
-                    startCountdown();
-                }, 50);
-            }, 600);
-        }
-
-        document.getElementById('btnYes1').addEventListener('click', triggerCelebration);
-        document.getElementById('btnYes2').addEventListener('click', triggerCelebration);
-
-        // COUNTDOWN TIMER TO TOMORROW EVENING (e.g. 19:00 / 7:00 PM)
-        function startCountdown() {
-            const countdownEl = document.getElementById('countdown');
-            
-            // Set target time: Tomorrow at 19:00
-            const now = new Date();
-            const target = new Date();
-            target.setDate(now.getDate() + 1);
-            target.setHours(19, 0, 0, 0);
-
-            function updateTimer() {
-                const currentTime = new Date();
-                const diff = target - currentTime;
-
-                if (diff <= 0) {
-                    countdownEl.innerText = "Скоро увидимся! ✨";
-                    return;
-                }
-
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-                countdownEl.innerText = `${hours}ч ${minutes}м ${seconds}с`;
-            }
-
-            updateTimer();
-            setInterval(updateTimer, 1000);
-        }
-    </script>
-</body>
-</html>
+    <!-- Этап 3: Экран подтверждения с таймером -->
+    <div class="invite-card success-screen" id="successScreen">
+      <div class="badge">Согласие получено</div>
+      <h1 class="success-title">Это будет волшебный день!</h1>
+      <p class="description">Готовься к ярким впечатлениям. Я
