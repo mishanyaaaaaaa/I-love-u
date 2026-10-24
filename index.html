@@ -347,4 +347,237 @@
     <div class="invite-card success-screen" id="successScreen">
       <div class="badge">Согласие получено</div>
       <h1 class="success-title">Это будет волшебный день!</h1>
-      <p class="description">Готовься к ярким впечатлениям. Я
+      <p class="description">Готовься к ярким впечатлениям. Я заберу тебя ровно в назначенное время.</p>
+      
+      <div class="timer-title">До нашего свидания осталось:</div>
+      <div class="timer">
+        <div class="timer-block">
+          <div class="timer-num" id="hours">00</div>
+          <div class="timer-label">Часов</div>
+        </div>
+        <div class="timer-block">
+          <div class="timer-num" id="minutes">00</div>
+          <div class="timer-label">Минут</div>
+        </div>
+        <div class="timer-block">
+          <div class="timer-num" id="seconds">00</div>
+          <div class="timer-label">Секунд</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* 1. Настройка звукового движка (Web Audio API) */
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // Мягкая расслабляющая фоновая мелодия / эмбиент
+    function startBackgroundMusic() {
+      initAudio();
+      
+      const notes = [261.63, 329.63, 392.00, 493.88, 523.25]; // C4, E4, G4, B4, C5
+      let noteIndex = 0;
+
+      function playAmbientChord() {
+        if (!audioCtx) return;
+
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        const filter = audioCtx.createBiquadFilter();
+
+        osc1.type = 'sine';
+        osc2.type = 'triangle';
+
+        const freq = notes[noteIndex % notes.length];
+        noteIndex++;
+
+        osc1.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc2.frequency.setValueAtTime(freq * 0.5, audioCtx.currentTime);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+
+        // Мягкое нарастание и затухание
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 2);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 5);
+
+        osc1.connect(filter);
+        osc2.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc1.start();
+        osc2.start();
+        osc1.stop(audioCtx.currentTime + 5.1);
+        osc2.stop(audioCtx.currentTime + 5.1);
+      }
+
+      playAmbientChord();
+      setInterval(playAmbientChord, 4000);
+    }
+
+    // Мягкий звук клика
+    function playClickSound() {
+      initAudio();
+      if (!audioCtx) return;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.08);
+
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.08);
+    }
+
+    // Автоматический запуск звука при любом первом взаимодействии или открытии
+    window.addEventListener('click', () => {
+      if (!audioCtx) startBackgroundMusic();
+    }, { once: true });
+
+    /* 2. Логика интерфейса */
+    function openInvitation() {
+      playClickSound();
+      if (!audioCtx) startBackgroundMusic();
+
+      const envelope = document.getElementById('envelopeCard');
+      const invite = document.getElementById('inviteCard');
+
+      envelope.style.opacity = '0';
+      envelope.style.transform = 'scale(0.8)';
+
+      setTimeout(() => {
+        envelope.style.display = 'none';
+        invite.style.display = 'block';
+      }, 500);
+    }
+
+    function moveButton() {
+      playClickSound();
+      const btn = document.getElementById('noBtn');
+      const x = (Math.random() - 0.5) * 160;
+      const y = (Math.random() - 0.5) * 80;
+      btn.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    function acceptInvitation() {
+      playClickSound();
+      document.getElementById('inviteCard').style.display = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+
+      // Эффект конфетти в винно-золотых тонах
+      confetti({
+        particleCount: 90,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#7A1C28', '#D4AF37', '#FAF5EF', '#4A0E17']
+      });
+
+      startTimer();
+    }
+
+    /* 3. Обратный отсчет до 25 Октября 12:00 */
+    function startTimer() {
+      // Автоматическое определение целевой даты (25 Октября 12:00 текущего/следующего года)
+      const now = new Date();
+      let targetYear = now.getFullYear();
+      let targetDate = new Date(targetYear, 9, 25, 12, 0, 0); // Месяц 9 = Октябрь (0-indexed)
+
+      if (now > targetDate) {
+        targetDate = new Date(targetYear + 1, 9, 25, 12, 0, 0);
+      }
+
+      function update() {
+        const currentTime = new Date();
+        const diff = targetDate - currentTime;
+
+        if (diff <= 0) {
+          document.getElementById('hours').innerText = '00';
+          document.getElementById('minutes').innerText = '00';
+          document.getElementById('seconds').innerText = '00';
+          return;
+        }
+
+        const hrs = Math.floor(diff / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('hours').innerText = String(hrs).padStart(2, '0');
+        document.getElementById('minutes').innerText = String(mins).padStart(2, '0');
+        document.getElementById('seconds').innerText = String(secs).padStart(2, '0');
+      }
+
+      update();
+      setInterval(update, 1000);
+    }
+
+    /* 4. Анимация фоновых золотых частиц */
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedY = -(Math.random() * 0.4 + 0.1);
+        this.opacity = Math.random() * 0.5 + 0.2;
+      }
+      update() {
+        this.y += this.speedY;
+        if (this.y < 0) this.reset();
+      }
+      draw() {
+        ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 40; i++) {
+      particles.push(new Particle());
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+  </script>
+</body>
+</html>
